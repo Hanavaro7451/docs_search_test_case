@@ -5,20 +5,30 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.db.session import engine
+from app.search.elasticsearch_service import es_service
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print(f'Starting {settings.ENVIRONMENT} environment')
-    try:
+    try:   # Проверка подключения к базе данных
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
-            print("Database connection successful")
+            print("Database успешно подключена")
     except Exception as e:
-        print(f"Database connection failed: {e}")
+        print(f"Database ошибка при подключении: {e}")
         raise e
+
+    try:   # Проверка подключения к Elasticsearch
+        es_service.connect()
+        print("Elasticsearch Успешно подключен и индекс создан")
+    except Exception as e:
+        print(f"Elasticsearch ошибка при подключении: {e}")
+        raise e
+
     yield
-    print(f'Shutting down {settings.ENVIRONMENT} environment')
+
+    print(f'Ошибка в {settings.ENVIRONMENT} подключении к Elasticsearch')
     await engine.dispose()
 
 app = FastAPI(
