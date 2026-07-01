@@ -5,6 +5,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.db.session import engine
+from app.routers.search import router as search_router
 from app.search.elasticsearch_service import es_service
 
 
@@ -37,6 +38,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.include_router(search_router)
 
 
 @app.get('/health', summary="Проверка состояния приложения")

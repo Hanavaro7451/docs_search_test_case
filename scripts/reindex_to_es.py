@@ -1,5 +1,6 @@
-import requests
 import asyncio
+
+import requests
 from sqlalchemy import select
 
 from app.db.session import AsyncSessionLocal
@@ -13,7 +14,7 @@ async def simple_reindex():
         documents = result.scalars().all()
     for doc in documents:
         requests.put(
-            f"http://localhost:9200/documents/_doc/{doc.id}",
+            f"http://elasticsearch:9200/documents/_doc/{doc.id}",
             json={
                 "text": doc.text,
                 "created_date": doc.created_date.isoformat()
